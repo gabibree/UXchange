@@ -21,6 +21,7 @@ var rate = "";
 var currency = "euro";
 var confidence = 0;
 var threshold = 0.89;
+var d = 0;
 
 // Load the model first
 
@@ -91,8 +92,6 @@ function splash() {
 }
 
 function main() {
-  /// code for splash screen
-
 
   // Draw the video
   image(flippedVideo, 0, 0, width, height);
@@ -109,9 +108,10 @@ function main() {
 
 }
 
-function mousePressed() {
+function touchStarted() {
 
   var distance = dist(width/2-50,height/2+137, mouseX,mouseY);
+
   console.log(distance);
   if (distance <= 100 && screen == "splash") {
     screen = "main";
