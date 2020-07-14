@@ -73,7 +73,7 @@ function splash() {
   ///code for splash screen
   
   background(255);
-  image (backgroundSplash,0,0);
+  image (backgroundSplash,0,0, width,height);
  image (logo, width/2-75,height/4);
   //rect(0,0,width,height);
   noStroke();
