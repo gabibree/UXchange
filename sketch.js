@@ -21,6 +21,7 @@ var rate = "";
 var currency = "euro";
 var confidence = 0;
 var threshold = 0.89;
+var d = 0;
 
 //splash vars
 var learnmore;
@@ -106,8 +107,11 @@ function splash() {
 }
 
 function main() {
+<<<<<<< HEAD
   /// code for splash screen
   learnmore.hide();
+=======
+>>>>>>> dc874f84e05ea290142c503c68bd9542718ebfe1
 
   // Draw the video
   image(flippedVideo, 0, 0, width, height);
@@ -127,9 +131,10 @@ function main() {
 
 }
 
-function mousePressed() {
+function touchStarted() {
 
   var distance = dist(width/2-50,height/2+137, mouseX,mouseY);
+
   console.log(distance);
   if (distance <= 100 && screen == "splash") {
     screen = "main";
