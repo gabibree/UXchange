@@ -107,11 +107,8 @@ function splash() {
 }
 
 function main() {
-<<<<<<< HEAD
   /// code for splash screen
   learnmore.hide();
-=======
->>>>>>> dc874f84e05ea290142c503c68bd9542718ebfe1
 
   // Draw the video
   image(flippedVideo, 0, 0, width, height);
