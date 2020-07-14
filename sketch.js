@@ -22,15 +22,22 @@ var currency = "euro";
 var confidence = 0;
 var threshold = 0.89;
 
+//splash vars
+var learnmore;
+//main vars
+var bkarrow;
+
 // Load the model first
 
 function preload() {
   classifier = ml5.imageClassifier(imageModelURL + 'model.json');
+  bkarrow=loadImage('assets/back_arrow.png');
 }
 
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+ 
   // Create the video
   video = createCapture(VIDEO);
   video.size(320, 240);
@@ -47,7 +54,13 @@ function setup() {
   
   backgroundSplash = loadImage('Assets/Background.png');
   arrow = loadImage('Assets/arrow-circle.png');
-  logo = loadImage('Assets/logo.png');       
+  logo = loadImage('Assets/logo.png');
+  learnmore = createA("about.html","learn more", "blank");
+  learnmore.position(width/2-40,height/2);       
+  learnmore.style ("font-family", "Ubuntu")
+  learnmore.style ("color", "#ADD8E6")
+  learnmore.style ("text-decoration", "none")
+
 
 }
 
@@ -71,28 +84,30 @@ function draw() {
 ///////// SCREENS //////////
 function splash() {
   ///code for splash screen
-  
+  learnmore.show();
   background(255);
   image (backgroundSplash,0,0, width,height);
  image (logo, width/2-75,height/4);
+ 
   //rect(0,0,width,height);
   noStroke();
   fill(255);
   //ellipse(width/2, height/2+150, 102, 102); 
   image (arrow,width/2-50,height/2+137);
   
-  textFont('Ubuntu');
+
   textAlign(CENTER);
   textSize(18);
   text ("This app uses Machine Learning technology to help you convert currency live.", width/2-100,height/2-100,211,100);
 
+  
 
 
 }
 
 function main() {
   /// code for splash screen
-
+  learnmore.hide();
 
   // Draw the video
   image(flippedVideo, 0, 0, width, height);
@@ -104,8 +119,11 @@ function main() {
   text(rate, width / 2, height - 4);
 
   currency = radio.value();
-  fill(200);
-  rect(0, 0, width, 50);
+ 
+  image(bkarrow,20,20);
+  image(logo,width/2-55,20);
+  fill(0)
+  rect(width/2-150,height/5,300,60,10);
 
 }
 
@@ -117,7 +135,7 @@ function mousePressed() {
     screen = "main";
   }
 
-  if (tapY <= 50 && screen == "main") {
+  if (mouseX < 50 && mouseY<= 50 && screen == "main") {
     screen = "splash";
   }
 
@@ -210,4 +228,8 @@ function canadaToDollar(amount) {
   var value = amount * 0.74;
   //console.log(value +" $");
   return value + " $";
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
 }
