@@ -27,6 +27,7 @@ var d = 0;
 var learnmore;
 //main vars
 var bkarrow;
+var frame;
 
 // Load the model first
 
@@ -41,7 +42,7 @@ function setup() {
  
   // Create the video
   video = createCapture(VIDEO);
-  video.size(320, 240);
+  video.size(windowWidth, windowHeight);
   video.hide();
 
   flippedVideo = ml5.flipImage(video);
@@ -56,6 +57,7 @@ function setup() {
   backgroundSplash = loadImage('Assets/Background.png');
   arrow = loadImage('Assets/arrow-circle.png');
   logo = loadImage('Assets/logo.png');
+  frame = loadImage('Assets/frame_marks.png');
   learnmore = createA("about.html","learn more", "blank");
   learnmore.position(width/2-40,height/2);       
   learnmore.style ("font-family", "Ubuntu")
@@ -128,7 +130,8 @@ function main() {
   rect(width/2-width/2.5,height/8,width/2+width/3.25,125,10);
   fill(255);
   textSize(40);
-  text ("Show me the money", width/2-width/2.5,height/8+50,500,500);
+  text ("Show me the money", width/2-width/2.5,height/8+40,500,500);
+  image (frame, 30, height/2-200,width-40,450);
   
 
 }
