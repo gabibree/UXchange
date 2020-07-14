@@ -1,5 +1,5 @@
 // UI Variables
-var screen = "splash";
+var screen = "main";
 var tapX, tapY;
 // Classifier Variable
 let classifier;
@@ -123,8 +123,13 @@ function main() {
  
   image(bkarrow,20,20);
   image(logo,width/2-55,20);
+  
   fill(0)
-  rect(width/2-150,height/5,300,60,10);
+  rect(width/2-width/2.5,height/8,width/2+width/3.25,125,10);
+  fill(255);
+  textSize(40);
+  text ("Show me the money", width/2-width/2.5,height/8+50,500,500);
+  
 
 }
 
