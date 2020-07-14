@@ -1,5 +1,5 @@
 // UI Variables
-var screen = "main";
+var screen = "splash";
 var tapX, tapY;
 // Classifier Variable
 let classifier;
@@ -39,13 +39,14 @@ function preload() {
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
- 
+  pixelDensity(1)
   // Create the video
   video = createCapture(VIDEO);
   video.size(windowWidth, windowHeight);
   video.hide();
-
+  push();
   flippedVideo = ml5.flipImage(video);
+  pop();
   // Start classifying
   classifyVideo();
   //radio buttons
@@ -61,7 +62,7 @@ function setup() {
   learnmore = createA("about.html","learn more", "blank");
   learnmore.position(width/2-40,height/2);       
   learnmore.style ("font-family", "Ubuntu")
-  learnmore.style ("color", "#ADD8E6")
+  learnmore.style ("color", "#D8AC3D")
   learnmore.style ("text-decoration", "none")
 
 
@@ -131,7 +132,7 @@ function main() {
   fill(255);
   textSize(40);
   text ("Show me the money", width/2-width/2.5,height/8+40,500,500);
-  image (frame, 30, height/2-200,width-40,450);
+  image (frame, 30, height/2-200,width-30,450);
   
 
 }
