@@ -111,7 +111,7 @@ function main() {
 
 function mousePressed() {
 
-  var distance = dist(width/2-50,height/2+137, tapX, tapY);
+  var distance = dist(width/2-50,height/2+137, mouseX,mouseY);
   console.log(distance);
   if (distance <= 100 && screen == "splash") {
     screen = "main";
