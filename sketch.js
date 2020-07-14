@@ -30,7 +30,7 @@ function preload() {
 
 
 function setup() {
-  createCanvas(375, 810);
+  createCanvas(windowWidth, windowHeight);
   // Create the video
   video = createCapture(VIDEO);
   video.size(320, 240);
