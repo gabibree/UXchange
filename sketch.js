@@ -64,6 +64,10 @@ function setup() {
   learnmore.style ("font-size", "45px")
   learnmore.style ("text-decoration", "none")
   learnmore.hide();
+   vid();
+
+
+
 }
 
 function draw() {
@@ -73,9 +77,9 @@ function draw() {
   if (screen == "loader") {
     //showme the screen splah
     loader();
-    setTimeout (function(){
+    if(ind==38){
       screen='splash';
-    }, 6000)
+    }
   }
   if (screen == "splash") {
     //showme the screen splah
@@ -163,7 +167,7 @@ function main() {
 function loader() {
   console.log('im loading')
   image (backgroundSplash,0,0,width,height);
-  image (imgs[ind],width/2,height/2);
+  image (imgs[ind],width/2-imgs[0].width,height/2-imgs[0].height,imgs[0].width*2,imgs[0].height*2 );
  
 }
 function touchStarted() {
@@ -463,8 +467,11 @@ function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
 
-setInterval(function(){
-  if(ind<39){
-    ind++;
-  }
-},100)
+function vid(){
+  setInterval(function(){
+    if(ind<39){
+      ind++;
+      console.log(ind)
+    }
+  },60)
+}
