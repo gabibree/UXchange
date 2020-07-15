@@ -159,7 +159,7 @@ function touchStarted() {
   var distance = dist(width/2-width/10,height/2+height/4, mouseX,mouseY);
 
   console.log(distance);
-  if (distance <= 150 && screen == "splash") {
+  if (distance <= 200 && screen == "splash") {
     screen = "main";
   }
 
