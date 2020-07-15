@@ -10,7 +10,7 @@ var arrow;
 var logo;
 var carousel;
 
-let state = "found";
+let state = "searching";
 var logoheader;
 
 
@@ -24,7 +24,7 @@ let label = "";
 var rate = "";
 var currency = "euro";
 var confidence = 0;
-var threshold = 0.89;
+var threshold = 0.9;
 
 //splash vars
 var learnmore;
@@ -145,8 +145,6 @@ function main() {
   textSize(16);
   textAlign(CENTER);
   text(rate, width / 2, height - 4);
-
-  // currency = radio.value();
  
   image(bkarrow,40,100,75,75);
   image(logoheader,width/2-width/6,100,310,64);
@@ -211,7 +209,7 @@ class Carousel {
     this.prevSelected;
     this.prevX;
     this.swiping = false;
-    this.cardsNum = 4;
+    this.cardsNum = 2;
     this.cardWidth = width/3;
     this.cardHeight = this.cardWidth/2;
     this.cardMargin = this.cardWidth/3;
@@ -275,7 +273,8 @@ class Carousel {
         this.prevSelected = this.selected;
         this.prevX = mouseX;
       }
-      console.log( this.cards[this.selected].id);
+      currency = this.cards[this.selected].currency;
+      console.log(currency);
     }
   }
 } 
@@ -292,7 +291,7 @@ class Card {
     this.rounded = 25;
     this.fontSize = 50;
     this.conv = 1000;
-    this.currency = "$$$"
+    this.currency = "";
     switch(id){
       case 0:
         this.currency = "USD";
@@ -332,7 +331,7 @@ class Card {
         rect(this.x - this.m/2,this.y-this.h/1.1,this.w + this.m,this.h*1.5,this.rounded);
         fill("#0C2C52");
         textSize(this.fontSize * 2);
-        text(this.conv,this.x+this.w/2,this.y + this.fontSize/10);
+        text(rate,this.x+this.w/2,this.y + this.fontSize/10);
       } else {
         // draw mode: selected default card
         fill(255,200);
@@ -389,27 +388,29 @@ function gotResult(error, results) {
   confidence = results[0].confidence;
 
   if (confidence > threshold) {
-    if (label == 'Argentina' && currency == "euro") {
+    state = "found";
+    if (label == 'Argentina' && currency == "EUR") {
       rate = argToEuro(20);
     }
-    if (label == 'Argentina' && currency == "dollar") {
+    if (label == 'Argentina' && currency == "USD") {
       rate = argToDollar(20);
     }
-    if (label == 'Indonesia' && currency == "euro") {
+    if (label == 'Indonesia' && currency == "EUR") {
       rate = rupiahToEuro(50000);
     }
-    if (label == 'Indonesia' && currency == "dollar") {
+    if (label == 'Indonesia' && currency == "USD") {
       rate = rupiahToDollar(50000);
     }
-    if (label == 'Canada' && currency == "euro") {
+    if (label == 'Canada' && currency == "EUR") {
       rate = canadaToEuro(20);
     }
-    if (label == 'Canada' && currency == "dollar") {
+    if (label == 'Canada' && currency == "USD") {
       rate = canadaToDollar(20);
     }
 
   } else {
-    rate = "I'm not sure... 😔";
+    state = "searching";
+    rate = "0";
   }
 
   // Classifiy again!
@@ -424,38 +425,38 @@ function gotResult(error, results) {
 
 function rupiahToEuro(amount) {
   var value = amount * 0.000062;
-  console.log(value + " €");
-  return value;
+  console.log(value);
+  return value.toFixed(2);
 }
 
 function rupiahToDollar(amount) {
   var value = amount * 0.000070;
-  console.log(value + " $");
-  return value;
+  console.log(value);
+  return value.toFixed(2);
 }
 
 function argToEuro(amount) {
   var value = amount * 0.013;
   //console.log(value +" €");
-  return value + " €";
+  return value.toFixed(2);
 }
 
 function argToDollar(amount) {
   var value = amount * 0.014;
   //console.log(value +" $");
-  return value + " $";
+  return value.toFixed(2);
 }
 
 function canadaToEuro(amount) {
   var value = amount * 0.66;
   //console.log(value +" €");
-  return value + " €";
+  return value.toFixed(2);
 }
 
 function canadaToDollar(amount) {
   var value = amount * 0.74;
   //console.log(value +" $");
-  return value + " $";
+  return value.toFixed(2);
 }
 
 function windowResized() {
