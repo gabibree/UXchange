@@ -121,7 +121,15 @@ function splash() {
 
 function mainSetup() {
   // Create the video
-  video = createCapture(VIDEO);
+  // video = createCapture(VIDEO);
+  video = createCapture({
+    audio: false,
+    video: {
+      facingMode: {
+        exact: "environment"
+      }
+    }
+  });
   video.size(windowWidth, windowHeight);
   video.hide();
   push();
