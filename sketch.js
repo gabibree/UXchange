@@ -1,5 +1,5 @@
 // UI Variables
-var screen = "main";
+var screen = "splash";
 var tapX, tapY;
 // Classifier Variable
 let classifier;
@@ -163,7 +163,7 @@ function touchStarted() {
     screen = "main";
   }
 
-  if (mouseX < 50 && mouseY<= 50 && screen == "main") {
+  if (mouseX <= 200 && mouseY<= 200 && screen == "main") {
     screen = "splash";
   }
 

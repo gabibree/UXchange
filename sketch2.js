@@ -12,11 +12,11 @@ function setup() {
   function draw() {
     
     image (backgroundSplash,0,0, width,height);
-    image (logo, width-500, 100);
-    image(bkarrow,20,20,100,100);
+    image (logo, width-width/2.5, 20);
+    image(bkarrow,40,100,75,75);
     textSize(100);
     fill(yellow);
-    text('About',20,400)
+    text('About',width/6,height/5)
     rectMode(CENTER);
     textAlign(LEFT);
     fill(255);
