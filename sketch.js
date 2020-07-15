@@ -8,6 +8,7 @@ let imageModelURL = 'https://teachablemachine.withgoogle.com/models/Svk4a1iJp/';
 var backgroundSplash;
 var arrow;
 var logo;
+var carousel;
 
 
 // Video
@@ -21,7 +22,6 @@ var rate = "";
 var currency = "euro";
 var confidence = 0;
 var threshold = 0.89;
-var d = 0;
 
 // Load the model first
 
@@ -32,24 +32,7 @@ function preload() {
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  // Create the video
-  video = createCapture(VIDEO);
-  video.size(320, 240);
-  video.hide();
-
-  flippedVideo = ml5.flipImage(video);
-  // Start classifying
-  classifyVideo();
-  //radio buttons
-  radio = createRadio();
-  radio.option('euro');
-  radio.option('dollar');
-  radio.style('width', '60px');
-  
-  backgroundSplash = loadImage('Assets/Background.png');
-  arrow = loadImage('Assets/arrow-circle.png');
-  logo = loadImage('Assets/logo.png');       
-
+  splashSetup();      
 }
 
 function draw() {
@@ -68,6 +51,11 @@ function draw() {
 
 }
 
+function splashSetup() {
+  backgroundSplash = loadImage('Assets/Background.png');
+  arrow = loadImage('Assets/arrow-circle.png');
+  logo = loadImage('Assets/logo.png'); 
+}
 
 ///////// SCREENS //////////
 function splash() {
@@ -75,7 +63,7 @@ function splash() {
   
   background(255);
   image (backgroundSplash,0,0, width,height);
- image (logo, width/2-75,height/4);
+  image (logo, width/2-75,height/4);
   //rect(0,0,width,height);
   noStroke();
   fill(255);
@@ -86,9 +74,24 @@ function splash() {
   textAlign(CENTER);
   textSize(18);
   text ("This app uses Machine Learning technology to help you convert currency live.", width/2-100,height/2-100,211,100);
+}
 
+function mainSetup() {
+  // Create the video
+  video = createCapture(VIDEO);
+  video.size(320, 240);
+  video.hide();
 
-
+  flippedVideo = ml5.flipImage(video);
+  // Start classifying
+  classifyVideo();
+  //radio buttons
+  radio = createRadio();
+  radio.option('euro');
+  radio.option('dollar');
+  radio.style('width', '60px');
+  carousel = new Carousel();
+  carousel.setup();
 }
 
 function main() {
@@ -106,22 +109,176 @@ function main() {
   fill(200);
   rect(0, 0, width, 50);
 
+  //carousel draw
+  carousel.display();
 }
 
 function touchStarted() {
-
   var distance = dist(width/2-50,height/2+137, mouseX,mouseY);
 
-  console.log(distance);
-  if (distance <= 100 && screen == "splash") {
-    screen = "main";
+  if(screen == "splash"){
+    if (distance <= 100) {
+      mainSetup();
+      screen = "main";
+    }
   }
-
-  if (tapY <= 50 && screen == "main") {
-    screen = "splash";
+  if(screen== "main"){ 
+    //back button click
+    if (tapY <= 50) {
+      screen = "splash";
+    }
+    //drag cards
+    carousel.touchStarted();
   }
-
 }
+
+function touchEnded (){
+  if(screen== "main"){ 
+  carousel.touchEnded();
+  }
+}
+
+function touchMoved (){
+  if(screen== "main"){ 
+  carousel.touchMoved();
+  }
+}
+
+class Carousel {
+  constructor(){ 
+    this.cards = [] ;
+    this.swipe = false;
+    this.directions = [-1,1];
+    this.direction;
+    this.selected = 1;
+    this.prevSelected;
+    this.prevX;
+    this.swiping = false;
+    this.cardsNum = 4;
+    this.cardWidth = width/3;
+    this.cardHeight = this.cardWidth/2;
+    this.cardMargin = this.cardWidth/3;
+  }
+
+  setup() {
+    for(var i = 0; i < this.cardsNum; i++){
+      this.cards.push(new Card(i, i * (this.cardWidth + this.cardMargin), height - 200, this.cardWidth, this.cardHeight, this.cardMargin));
+    } 
+  }
+
+  display() {
+    push();
+    background(220);
+    for(var i = 0; i < this.cardsNum; i++){
+      this.cards[i].display();
+    }
+    if(this.swipe){
+      for(var i = 0; i < this.cardsNum; i++){
+        this.cards[i].move(this.direction);
+      }
+    }
+    pop();
+  }
+
+  touchStarted(){
+    this.prevX = mouseX;
+
+  }
+  touchEnded(){
+    this.swiping = false;
+  }
+
+  touchMoved(){
+    this.swiping = true;
+  
+  
+    var thres = abs(this.prevX - mouseX);
+
+    if(thres > width/6){
+      if(this.prevX-mouseX>0){
+        this.direction = -1;
+      }else{
+        this.direction = 1;
+      }
+      this.selected -= this.direction;
+      if(this.selected <0 || this.selected > this.cardsNum - 1){
+        this.selected = this.prevSelected
+      }else{
+        this.swipe = true;
+        this.prevSelected = this.selected;
+        this.prevX = mouseX;
+      }
+      console.log( this.cards[this.selected].id);
+    }
+  }
+} 
+
+class Card {
+
+  constructor(id,posX, posY,width,height,margin) {
+    this.id = id;
+    this.x = posX;
+    this.y = posY;
+    this.w = width;
+    this.h = height;
+    this.step = width + margin;
+    this.conv = 0;
+    this.currency = "$$$"
+    switch(id){
+      case 0:
+        this.currency = "USD";
+        break;
+      case 1:
+        this.currency = "EUR";
+         break;
+      case 2:
+        this.currency = "YEN";
+         break;
+      case 3:
+        this.currency = "PESOS";
+         break;
+    }  
+  }
+  
+  display(){
+    push();
+ 
+    noStroke();
+    if(carousel.selected == this.id && carousel.swiping == false){
+      // draw mode: selected card
+      fill(255,120);
+      rect(this.x,this.y + 10,this.w,this.h,10);
+
+      fill(20);
+      textAlign(CENTER);
+      text(this.currency,this.x+this.w/2,this.y+this.h/1);
+      fill(0,30);
+      rect(this.x,this.y-this.h/1.2,this.w,this.h*1.5,10);
+       fill(255);
+      rect(this.x,this.y-this.h/1.1,this.w,this.h*1.5,10);
+         fill(0);
+         text(this.conv,this.x+this.w/2,this.y);
+    } else {
+      // draw mode: default card
+      fill(255,120);
+      rect(this.x,this.y,this.w,this.h,10);
+
+      fill(20);
+      textAlign(CENTER);
+      text(this.currency,this.x+this.w/2,this.y+this.h/1.6);
+    }
+    pop(); 
+  }
+
+  move(dir){
+    this.x += dir * this.step;
+    carousel.swipe = false;
+  }
+}
+
+
+/////// ML5 //////
+
 // Get a prediction for the current video frame
 function classifyVideo() {
   flippedVideo = ml5.flipImage(video)
