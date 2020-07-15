@@ -10,6 +10,8 @@ var arrow;
 var logo;
 var carousel;
 
+let state = "found";
+
 
 // Video
 let video;
@@ -86,10 +88,10 @@ function mainSetup() {
   // Start classifying
   classifyVideo();
   //radio buttons
-  radio = createRadio();
-  radio.option('euro');
-  radio.option('dollar');
-  radio.style('width', '60px');
+  // radio = createRadio();
+  // radio.option('euro');
+  // radio.option('dollar');
+  // radio.style('width', '60px');
   carousel = new Carousel();
   carousel.setup();
 }
@@ -105,7 +107,7 @@ function main() {
   textAlign(CENTER);
   text(rate, width / 2, height - 4);
 
-  currency = radio.value();
+  // currency = radio.value();
   fill(200);
   rect(0, 0, width, 50);
 
@@ -158,23 +160,35 @@ class Carousel {
     this.cardWidth = width/3;
     this.cardHeight = this.cardWidth/2;
     this.cardMargin = this.cardWidth/3;
+    this.step = this.cardWidth + this.cardMargin;
   }
 
   setup() {
     for(var i = 0; i < this.cardsNum; i++){
-      this.cards.push(new Card(i, i * (this.cardWidth + this.cardMargin), height - 200, this.cardWidth, this.cardHeight, this.cardMargin));
+      this.cards.push(new Card(i, i * (this.cardWidth + this.cardMargin) - (this.cardWidth/2 - this.cardMargin/2), height - height/5, this.cardWidth, this.cardHeight, this.cardMargin));
     } 
   }
 
   display() {
     push();
-    background(220);
+    background(225,0,0);
     for(var i = 0; i < this.cardsNum; i++){
       this.cards[i].display();
     }
+    // let dist;
+    // if(this.swiping){
+    //   console.log("swiping");
+    //   dist = abs(this.prevX - mouseX)/10;
+    //   if(dist > this.cardWidth + this.cardMargin/2){
+    //     return;
+    //   }
+    //   for(var i = 0; i < this.cardsNum; i++){
+    //     this.cards[i].move(this.direction,dist,true);
+    //   }
+    // }
     if(this.swipe){
       for(var i = 0; i < this.cardsNum; i++){
-        this.cards[i].move(this.direction);
+        this.cards[i].move(this.direction, this.step,false);
       }
     }
     pop();
@@ -190,8 +204,6 @@ class Carousel {
 
   touchMoved(){
     this.swiping = true;
-  
-  
     var thres = abs(this.prevX - mouseX);
 
     if(thres > width/6){
@@ -221,8 +233,10 @@ class Card {
     this.y = posY;
     this.w = width;
     this.h = height;
-    this.step = width + margin;
-    this.conv = 0;
+    this.m = margin;
+    this.rounded = 25;
+    this.fontSize = 50;
+    this.conv = 1000;
     this.currency = "$$$"
     switch(id){
       case 0:
@@ -242,36 +256,56 @@ class Card {
   
   display(){
     push();
- 
     noStroke();
+    textStyle(BOLD);
+    textAlign(CENTER);
     if(carousel.selected == this.id && carousel.swiping == false){
-      // draw mode: selected card
-      fill(255,120);
-      rect(this.x,this.y + 10,this.w,this.h,10);
+      // draw mode: selected found card
 
-      fill(20);
-      textAlign(CENTER);
-      text(this.currency,this.x+this.w/2,this.y+this.h/1);
-      fill(0,30);
-      rect(this.x,this.y-this.h/1.2,this.w,this.h*1.5,10);
-       fill(255);
-      rect(this.x,this.y-this.h/1.1,this.w,this.h*1.5,10);
-         fill(0);
-         text(this.conv,this.x+this.w/2,this.y);
+      if(state == "found"){
+        // currency
+        fill(255,120);
+        rect(this.x - this.m/2,this.y - this.m/4 + this.h/4,this.w + this.m,this.h + this.m/2,this.rounded);
+        fill(20);
+        textSize(this.fontSize + 10);
+        text(this.currency,this.x+this.w/2,this.y+this.h*1.1);
+        // shadow
+        fill(0,15);
+        rect(this.x - this.m/2,this.y-this.h/1.2,this.w + this.m,this.h*1.5,this.rounded);
+        //rate
+        fill(255);
+        rect(this.x - this.m/2,this.y-this.h/1.1,this.w + this.m,this.h*1.5,this.rounded);
+        fill(0);
+        textSize(this.fontSize * 2);
+        text(this.conv,this.x+this.w/2,this.y + this.fontSize/10);
+      } else {
+        // draw mode: selected default card
+        fill(255,120);
+        rect(this.x - this.m/2,this.y - this.m/4 ,this.w + this.m,this.h + this.m/2,this.rounded);
+        fill(20);
+        textAlign(CENTER);
+        textSize(this.fontSize + 10);
+        text(this.currency,this.x+this.w/2,this.y+this.h/1.6);
+      }
+
     } else {
       // draw mode: default card
       fill(255,120);
-      rect(this.x,this.y,this.w,this.h,10);
+      rect(this.x,this.y,this.w,this.h,this.rounded);
 
       fill(20);
       textAlign(CENTER);
+      textSize(this.fontSize);
       text(this.currency,this.x+this.w/2,this.y+this.h/1.6);
     }
     pop(); 
   }
 
-  move(dir){
-    this.x += dir * this.step;
+  move(dir, step){
+    // if(swiping = true && dir>this.w + this.m){
+    //   dir = 0;
+    // }
+    this.x += dir * step;
     carousel.swipe = false;
   }
 }
