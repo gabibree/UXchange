@@ -8,6 +8,9 @@ let imageModelURL = 'https://teachablemachine.withgoogle.com/models/Svk4a1iJp/';
 var backgroundSplash;
 var arrow;
 var logo;
+var carousel;
+
+let state = "found";
 var logoheader;
 
 
@@ -22,7 +25,6 @@ var rate = "";
 var currency = "euro";
 var confidence = 0;
 var threshold = 0.89;
-var d = 0;
 
 //splash vars
 var learnmore;
@@ -52,27 +54,9 @@ console.log(imgs.length)
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  splashSetup();      
   pixelDensity(1)
-  // Create the video
-  video = createCapture(VIDEO);
-  video.size(windowWidth, windowHeight);
-  video.hide();
-  push();
-  flippedVideo = ml5.flipImage(video);
-  pop();
-  // Start classifying
-  classifyVideo();
-  //radio buttons
-  radio = createRadio();
-  radio.option('euro');
-  radio.option('dollar');
-  radio.style('width', '60px');
   
-  backgroundSplash = loadImage('Assets/Background.png');
-  arrow = loadImage('Assets/arrow-circle.png');
-  logo = loadImage('Assets/logo.png');
-  logoheader = loadImage('Assets/logo-header.png');
-  frame = loadImage('Assets/frame_marks.png');
   learnmore = createA("about.html","learn more", "blank");
   learnmore.position(width/2-width/10,height/2);       
   learnmore.style ("font-family", "Ubuntu")
@@ -110,6 +94,11 @@ function draw() {
 
 }
 
+function splashSetup() {
+  backgroundSplash = loadImage('Assets/Background.png');
+  arrow = loadImage('Assets/arrow-circle.png');
+  logo = loadImage('Assets/logo.png'); 
+}
 
 ///////// SCREENS //////////
 function splash() {
@@ -125,14 +114,27 @@ function splash() {
   //ellipse(width/2, height/2+150, 102, 102); 
   image (arrow,width/2-width/10,height/2+height/4);
   
-
   textAlign(CENTER);
   textSize(45);
   text ("This app uses Machine Learning technology to help you convert currency live.", width/2-width/3.5,height/2-height/10,600,500);
+}
 
+function mainSetup() {
+  // Create the video
+  video = createCapture(VIDEO);
+  video.size(windowWidth, windowHeight);
+  video.hide();
+  push();
+  flippedVideo = ml5.flipImage(video);
+  pop();
+  // Start classifying
+  classifyVideo();
+
+  logoheader = loadImage('Assets/logo-header.png');
+  frame = loadImage('Assets/frame_marks.png');
   
-
-
+  carousel = new Carousel();
+  carousel.setup();
 }
 
 function main() {
@@ -148,7 +150,7 @@ function main() {
   textAlign(CENTER);
   text(rate, width / 2, height - 4);
 
-  currency = radio.value();
+  // currency = radio.value();
  
   image(bkarrow,40,100,75,75);
   image(logoheader,width/2-width/6,100,310,64);
@@ -161,6 +163,8 @@ function main() {
   image (frame, 30, height/2-200,width-30,450);
   
 
+  //carousel draw
+  carousel.display();
 }
 function loader() {
   console.log('im loading')
@@ -172,16 +176,202 @@ function touchStarted() {
 
   var distance = dist(width/2-width/10,height/2+height/4, mouseX,mouseY);
 
-  console.log(distance);
-  if (distance <= 200 && screen == "splash") {
-    screen = "main";
+  if(screen == "splash"){
+    if (distance <= 200) {
+      screen = "main";
+      mainSetup();
+    }
   }
+  if(screen== "main"){ 
+    //back button click
+    if (mouseX <= 200 && mouseY<= 200) {
+      screen = "splash";
+    }
 
-  if (mouseX <= 200 && mouseY<= 200 && screen == "main") {
-    screen = "splash";
+    //drag cards
+    carousel.touchStarted();
   }
-
 }
+
+function touchEnded (){
+  if(screen== "main"){ 
+    carousel.touchEnded();
+  }
+}
+
+function touchMoved (){
+  if(screen== "main"){ 
+    carousel.touchMoved();
+  }
+}
+
+class Carousel {
+  constructor(){ 
+    this.cards = [] ;
+    this.swipe = false;
+    this.directions = [-1,1];
+    this.direction;
+    this.selected = 1;
+    this.prevSelected;
+    this.prevX;
+    this.swiping = false;
+    this.cardsNum = 4;
+    this.cardWidth = width/3;
+    this.cardHeight = this.cardWidth/2;
+    this.cardMargin = this.cardWidth/3;
+    this.step = this.cardWidth + this.cardMargin;
+  }
+
+  setup() {
+    for(var i = 0; i < this.cardsNum; i++){
+      this.cards.push(new Card(i, i * (this.cardWidth + this.cardMargin) - (this.cardWidth/2 - this.cardMargin/2), height - height/5, this.cardWidth, this.cardHeight, this.cardMargin));
+    } 
+  }
+
+  display() {
+    push();
+    background(220,10);
+    for(var i = 0; i < this.cardsNum; i++){
+      this.cards[i].display();
+    }
+    // let dist;
+    // if(this.swiping){
+    //   console.log("swiping");
+    //   dist = abs(this.prevX - mouseX)/10;
+    //   if(dist > this.cardWidth + this.cardMargin/2){
+    //     return;
+    //   }
+    //   for(var i = 0; i < this.cardsNum; i++){
+    //     this.cards[i].move(this.direction,dist,true);
+    //   }
+    // }
+    if(this.swipe){
+      for(var i = 0; i < this.cardsNum; i++){
+        this.cards[i].move(this.direction, this.step,false);
+      }
+    }
+    pop();
+  }
+
+  touchStarted(){
+    this.prevX = mouseX;
+
+  }
+  touchEnded(){
+    this.swiping = false;
+  }
+
+  touchMoved(){
+    this.swiping = true;
+    var thres = abs(this.prevX - mouseX);
+
+    if(thres > width/6){
+      if(this.prevX-mouseX>0){
+        this.direction = -1;
+      }else{
+        this.direction = 1;
+      }
+      this.selected -= this.direction;
+      if(this.selected <0 || this.selected > this.cardsNum - 1){
+        this.selected = this.prevSelected
+      }else{
+        this.swipe = true;
+        this.prevSelected = this.selected;
+        this.prevX = mouseX;
+      }
+      console.log( this.cards[this.selected].id);
+    }
+  }
+} 
+
+class Card {
+
+  constructor(id,posX, posY,width,height,margin) {
+    this.id = id;
+    this.x = posX;
+    this.y = posY;
+    this.w = width;
+    this.h = height;
+    this.m = margin;
+    this.rounded = 25;
+    this.fontSize = 50;
+    this.conv = 1000;
+    this.currency = "$$$"
+    switch(id){
+      case 0:
+        this.currency = "USD";
+        break;
+      case 1:
+        this.currency = "EUR";
+         break;
+      case 2:
+        this.currency = "YEN";
+         break;
+      case 3:
+        this.currency = "PESOS";
+         break;
+    }  
+  }
+  
+  display(){
+    push();
+    noStroke();
+    textStyle(BOLD);
+    textAlign(CENTER);
+    if(carousel.selected == this.id && carousel.swiping == false){
+      // draw mode: selected found card
+
+      if(state == "found"){
+        // currency
+        fill(255,200);
+        rect(this.x - this.m/2,this.y - this.m/4 + this.h/4,this.w + this.m,this.h + this.m/2,this.rounded);
+        fill(20);
+        textSize(this.fontSize + 10);
+        text(this.currency,this.x+this.w/2,this.y+this.h*1.1);
+        // shadow
+        fill(0,15);
+        rect(this.x - this.m/2,this.y-this.h/1.2,this.w + this.m,this.h*1.5,this.rounded);
+        //rate
+        fill("#D8AC3D");
+        rect(this.x - this.m/2,this.y-this.h/1.1,this.w + this.m,this.h*1.5,this.rounded);
+        fill("#0C2C52");
+        textSize(this.fontSize * 2);
+        text(this.conv,this.x+this.w/2,this.y + this.fontSize/10);
+      } else {
+        // draw mode: selected default card
+        fill(255,200);
+        rect(this.x - this.m/2,this.y - this.m/4 ,this.w + this.m,this.h + this.m/2,this.rounded);
+        fill(20);
+        textAlign(CENTER);
+        textSize(this.fontSize + 10);
+        text(this.currency,this.x+this.w/2,this.y+this.h/1.6);
+      }
+
+    } else {
+      // draw mode: default card
+      fill(255,200);
+      rect(this.x,this.y,this.w,this.h,this.rounded);
+
+      fill(20);
+      textAlign(CENTER);
+      textSize(this.fontSize);
+      text(this.currency,this.x+this.w/2,this.y+this.h/1.6);
+    }
+    pop(); 
+  }
+
+  move(dir, step){
+    // if(swiping = true && dir>this.w + this.m){
+    //   dir = 0;
+    // }
+    this.x += dir * step;
+    carousel.swipe = false;
+  }
+}
+
+
+/////// ML5 //////
+
 // Get a prediction for the current video frame
 function classifyVideo() {
   flippedVideo = ml5.flipImage(video)
