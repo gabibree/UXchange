@@ -1,5 +1,5 @@
 // UI Variables
-var screen = "splash";
+var screen = "loader";
 var tapX, tapY;
 // Classifier Variable
 let classifier;
@@ -11,6 +11,7 @@ var logo;
 var carousel;
 
 let state = "found";
+var logoheader;
 
 
 // Video
@@ -25,26 +26,50 @@ var currency = "euro";
 var confidence = 0;
 var threshold = 0.89;
 
+//splash vars
+var learnmore;
+//main vars
+var bkarrow;
+var frame;
+
 // Load the model first
 
 function preload() {
   classifier = ml5.imageClassifier(imageModelURL + 'model.json');
+  bkarrow=loadImage('assets/back_arrow.png');
 }
 
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   splashSetup();      
+  pixelDensity(1)
+  
+  learnmore = createA("about.html","learn more", "blank");
+  learnmore.position(width/2-width/10,height/2);       
+  learnmore.style ("font-family", "Ubuntu")
+  learnmore.style ("color", "#D8AC3D")
+  learnmore.style ("font-size", "45px")
+  learnmore.style ("text-decoration", "none")
+  learnmore.hide();
 }
 
 function draw() {
 
   tapX = mouseX;
   tapY = mouseY;
+  if (screen == "loader") {
+    //showme the screen splah
+    loader();
+    setTimeout (function(){
+      screen='splash';
+    }, 3000)
+  }
   if (screen == "splash") {
     //showme the screen splah
     splash();
   }
+
   if (screen == "main") {
     //showme the screen main
     main();
@@ -62,41 +87,43 @@ function splashSetup() {
 ///////// SCREENS //////////
 function splash() {
   ///code for splash screen
-  
+  learnmore.show();
   background(255);
   image (backgroundSplash,0,0, width,height);
-  image (logo, width/2-75,height/4);
+  image (logo, width/2-width/5,height/6);
+ 
   //rect(0,0,width,height);
   noStroke();
   fill(255);
   //ellipse(width/2, height/2+150, 102, 102); 
-  image (arrow,width/2-50,height/2+137);
+  image (arrow,width/2-width/10,height/2+height/4);
   
-  textFont('Ubuntu');
   textAlign(CENTER);
-  textSize(18);
-  text ("This app uses Machine Learning technology to help you convert currency live.", width/2-100,height/2-100,211,100);
+  textSize(45);
+  text ("This app uses Machine Learning technology to help you convert currency live.", width/2-width/3.5,height/2-height/10,600,500);
 }
 
 function mainSetup() {
   // Create the video
   video = createCapture(VIDEO);
-  video.size(320, 240);
+  video.size(windowWidth, windowHeight);
   video.hide();
-
+  push();
   flippedVideo = ml5.flipImage(video);
+  pop();
   // Start classifying
   classifyVideo();
-  //radio buttons
-  // radio = createRadio();
-  // radio.option('euro');
-  // radio.option('dollar');
-  // radio.style('width', '60px');
+
+  logoheader = loadImage('Assets/logo-header.png');
+  frame = loadImage('Assets/frame_marks.png');
+  
   carousel = new Carousel();
   carousel.setup();
 }
 
 function main() {
+  /// code for splash screen
+  learnmore.hide();
 
   // Draw the video
   image(flippedVideo, 0, 0, width, height);
@@ -108,27 +135,42 @@ function main() {
   text(rate, width / 2, height - 4);
 
   // currency = radio.value();
-  fill(200);
-  rect(0, 0, width, 50);
+ 
+  image(bkarrow,40,100,75,75);
+  image(logoheader,width/2-width/6,100,310,64);
+  
+  fill(0)
+  rect(width/2-width/2.5,height/8,width/2+width/3.25,125,10);
+  fill(255);
+  textSize(40);
+  text ("Show me the money", width/2-width/2.5,height/8+40,500,500);
+  image (frame, 30, height/2-200,width-30,450);
+  
 
   //carousel draw
   carousel.display();
 }
-
+function loader() {
+  console.log('im loading')
+  image (backgroundSplash,0,0,width,height);
+  text ("lalalala",width/2,height/2);
+}
 function touchStarted() {
-  var distance = dist(width/2-50,height/2+137, mouseX,mouseY);
+
+  var distance = dist(width/2-width/10,height/2+height/4, mouseX,mouseY);
 
   if(screen == "splash"){
-    if (distance <= 100) {
-      mainSetup();
+    if (distance <= 200) {
       screen = "main";
+      mainSetup();
     }
   }
   if(screen== "main"){ 
     //back button click
-    if (tapY <= 50) {
+    if (mouseX <= 200 && mouseY<= 200) {
       screen = "splash";
     }
+
     //drag cards
     carousel.touchStarted();
   }
@@ -136,13 +178,13 @@ function touchStarted() {
 
 function touchEnded (){
   if(screen== "main"){ 
-  carousel.touchEnded();
+    carousel.touchEnded();
   }
 }
 
 function touchMoved (){
   if(screen== "main"){ 
-  carousel.touchMoved();
+    carousel.touchMoved();
   }
 }
 
@@ -171,7 +213,7 @@ class Carousel {
 
   display() {
     push();
-    background(225,0,0);
+    background(220,10);
     for(var i = 0; i < this.cardsNum; i++){
       this.cards[i].display();
     }
@@ -264,7 +306,7 @@ class Card {
 
       if(state == "found"){
         // currency
-        fill(255,120);
+        fill(255,200);
         rect(this.x - this.m/2,this.y - this.m/4 + this.h/4,this.w + this.m,this.h + this.m/2,this.rounded);
         fill(20);
         textSize(this.fontSize + 10);
@@ -273,14 +315,14 @@ class Card {
         fill(0,15);
         rect(this.x - this.m/2,this.y-this.h/1.2,this.w + this.m,this.h*1.5,this.rounded);
         //rate
-        fill(255);
+        fill("#D8AC3D");
         rect(this.x - this.m/2,this.y-this.h/1.1,this.w + this.m,this.h*1.5,this.rounded);
-        fill(0);
+        fill("#0C2C52");
         textSize(this.fontSize * 2);
         text(this.conv,this.x+this.w/2,this.y + this.fontSize/10);
       } else {
         // draw mode: selected default card
-        fill(255,120);
+        fill(255,200);
         rect(this.x - this.m/2,this.y - this.m/4 ,this.w + this.m,this.h + this.m/2,this.rounded);
         fill(20);
         textAlign(CENTER);
@@ -290,7 +332,7 @@ class Card {
 
     } else {
       // draw mode: default card
-      fill(255,120);
+      fill(255,200);
       rect(this.x,this.y,this.w,this.h,this.rounded);
 
       fill(20);
@@ -401,4 +443,8 @@ function canadaToDollar(amount) {
   var value = amount * 0.74;
   //console.log(value +" $");
   return value + " $";
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
 }
