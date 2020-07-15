@@ -1,5 +1,5 @@
 // UI Variables
-var screen = "splash";
+var screen = "main";
 var tapX, tapY;
 // Classifier Variable
 let classifier;
@@ -8,6 +8,7 @@ let imageModelURL = 'https://teachablemachine.withgoogle.com/models/Svk4a1iJp/';
 var backgroundSplash;
 var arrow;
 var logo;
+var logoheader;
 
 
 // Video
@@ -58,12 +59,16 @@ function setup() {
   backgroundSplash = loadImage('Assets/Background.png');
   arrow = loadImage('Assets/arrow-circle.png');
   logo = loadImage('Assets/logo.png');
+  logoheader = loadImage('Assets/logo-header.png');
   frame = loadImage('Assets/frame_marks.png');
   learnmore = createA("about.html","learn more", "blank");
-  learnmore.position(width/2-40,height/2);       
+  learnmore.position(width/2-width/10,height/2);       
   learnmore.style ("font-family", "Ubuntu")
   learnmore.style ("color", "#D8AC3D")
+  learnmore.style ("font-size", "45px")
   learnmore.style ("text-decoration", "none")
+  learnmore.hide();
+
 
 
 }
@@ -72,10 +77,18 @@ function draw() {
 
   tapX = mouseX;
   tapY = mouseY;
+  if (screen == "loader") {
+    //showme the screen splah
+    loader();
+    setTimeout (function(){
+      screen='splash';
+    }, 3000)
+  }
   if (screen == "splash") {
     //showme the screen splah
     splash();
   }
+
   if (screen == "main") {
     //showme the screen main
     main();
@@ -91,18 +104,18 @@ function splash() {
   learnmore.show();
   background(255);
   image (backgroundSplash,0,0, width,height);
- image (logo, width/2-75,height/4);
+  image (logo, width/2-width/5,height/6);
  
   //rect(0,0,width,height);
   noStroke();
   fill(255);
   //ellipse(width/2, height/2+150, 102, 102); 
-  image (arrow,width/2-50,height/2+137);
+  image (arrow,width/2-width/10,height/2+height/4);
   
 
   textAlign(CENTER);
-  textSize(18);
-  text ("This app uses Machine Learning technology to help you convert currency live.", width/2-100,height/2-100,211,100);
+  textSize(45);
+  text ("This app uses Machine Learning technology to help you convert currency live.", width/2-width/3.5,height/2-height/10,600,500);
 
   
 
@@ -124,8 +137,8 @@ function main() {
 
   currency = radio.value();
  
-  image(bkarrow,20,20);
-  image(logo,width/2-55,20);
+  image(bkarrow,40,100,75,75);
+  image(logoheader,width/2-width/6,100,310,64);
   
   fill(0)
   rect(width/2-width/2.5,height/8,width/2+width/3.25,125,10);
@@ -136,13 +149,17 @@ function main() {
   
 
 }
-
+function loader() {
+  console.log('im loading')
+  image (backgroundSplash,0,0,width,height);
+  text ("lalalala",width/2,height/2);
+}
 function touchStarted() {
 
-  var distance = dist(width/2-50,height/2+137, mouseX,mouseY);
+  var distance = dist(width/2-width/10,height/2+height/4, mouseX,mouseY);
 
   console.log(distance);
-  if (distance <= 100 && screen == "splash") {
+  if (distance <= 150 && screen == "splash") {
     screen = "main";
   }
 
