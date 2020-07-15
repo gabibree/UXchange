@@ -29,12 +29,24 @@ var learnmore;
 //main vars
 var bkarrow;
 var frame;
+//loader vars
+var totalImg = 40;
+var imgs = [];
+var index;
+var im;
+var ind =0;
 
 // Load the model first
 
 function preload() {
   classifier = ml5.imageClassifier(imageModelURL + 'model.json');
   bkarrow=loadImage('assets/back_arrow.png');
+  for ( var i = 0 ; i < totalImg; i ++){
+    index = i+13;
+    imgs [i] = loadImage ("Assets/logo/logo-a_000"+index+".png");
+
+}
+console.log(imgs.length)
 }
 
 
@@ -82,7 +94,7 @@ function draw() {
     loader();
     setTimeout (function(){
       screen='splash';
-    }, 3000)
+    }, 6000)
   }
   if (screen == "splash") {
     //showme the screen splah
@@ -152,7 +164,8 @@ function main() {
 function loader() {
   console.log('im loading')
   image (backgroundSplash,0,0,width,height);
-  text ("lalalala",width/2,height/2);
+  image (imgs[ind],width/2,height/2);
+ 
 }
 function touchStarted() {
 
@@ -261,3 +274,9 @@ function canadaToDollar(amount) {
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
+
+setInterval(function(){
+  if(ind<39){
+    ind++;
+  }
+},100)
