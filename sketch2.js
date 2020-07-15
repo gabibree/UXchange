@@ -1,17 +1,22 @@
 var backgroundSplash;
 var logo;
-
+var yellow="#D8AC3D";
+var bkarrow;
 function setup() {
     createCanvas(windowWidth, windowHeight);
     backgroundSplash = loadImage('Assets/Background.png');
     logo = loadImage('Assets/logo.png');
+    bkarrow=loadImage('assets/back_arrow.png');
   }
   
   function draw() {
+    
     image (backgroundSplash,0,0, width,height);
     image (logo, width-500, 100);
+    image(bkarrow,20,20,100,100);
     textSize(100);
-    text('ABOUT',0,400)
+    fill(yellow);
+    text('About',20,400)
     rectMode(CENTER);
     textAlign(LEFT);
     fill(255);
@@ -20,6 +25,13 @@ function setup() {
 
   
   }
+  function touchStarted() {
+      if  (mouseX < 200 && mouseY<= 200) {
+          console.log("im pressing");
+        window.location.href="index.html"
+      }
+  }
+
   function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
   }
