@@ -1,5 +1,5 @@
 // UI Variables
-var screen = "splash";
+var screen = "loader";
 var tapX, tapY;
 // Classifier Variable
 let classifier;
